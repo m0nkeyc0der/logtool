@@ -13,10 +13,13 @@ import doctest
 import re
 import unittest
 
-import logbro.util.knuth_morris_pratt as kmp
+# import logbro.util.knuth_morris_pratt as kmp
 
+# Apparently, KMP does two times worse than _contains() with any(<genexpr>)
+# def _contains(subseq, inseq): return kmp.contains(subseq, inseq)
 
-def _contains(subseq, inseq): return kmp.contains(subseq, inseq)
+def _contains(subseq, inseq):
+    return any(inseq[pos:pos + len(subseq)] == subseq for pos in range(0, len(inseq) - len(subseq) + 1))
 
 def find_all_common_subseq(s1, s2, threshold=3):
 
@@ -66,6 +69,40 @@ def pretty_highlight(instr, all_css, mask_char=None):
     
     # return as string
     return ''.join(template)
+
+class TestContainsForString(unittest.TestCase):
+    
+    def test_smoketest(self):
+        self.assertTrue(_contains('abc', 'abc cde fgi'))
+
+    def test_contains_middle_seq(self):
+        self.assertTrue(_contains('cde', 'abc cde fgi'))
+
+    def test_contains_end_seq(self):
+        self.assertTrue(_contains('fgi', 'abc cde fgi'))
+
+    def test_contains_oversized_seq(self):
+        self.assertFalse(_contains('abc cde fgi!', 'abc cde fgi'))
+
+    def test_contains_iteslf(self):
+        self.assertTrue(_contains('abc cde fgi', 'abc cde fgi'))
+
+class TestContainsForList(unittest.TestCase):
+    
+    def test_smoketest(self):
+        self.assertTrue(_contains('ab c'.split(' '), 'ab c cde fgi'.split(' ')))
+
+    def test_contains_middle_seq(self):
+        self.assertTrue(_contains('cd e'.split(' '), 'abc cd e fgi'.split(' ')))
+ 
+    def test_contains_end_seq(self):
+        self.assertTrue(_contains('f gi'.split(' '), 'abc cde f gi'.split(' ')))
+ 
+    def test_contains_oversized_seq(self):
+        self.assertFalse(_contains('abc cde fgi fgi'.split(' '), 'abc cde fgi'.split(' ')))
+ 
+    def test_contains_iteslf(self):
+        self.assertTrue(_contains(*['abc cde fgi'] * 2))
 
 class Test_FindAllCommonSubseq(unittest.TestCase):
     
