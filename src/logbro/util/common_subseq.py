@@ -19,7 +19,7 @@ import unittest
 # def _contains(subseq, inseq): return kmp.contains(subseq, inseq)
 
 def _contains(subseq, inseq):
-    return any(inseq[pos:pos + len(subseq)] == subseq for pos in range(0, len(inseq) - len(subseq) + 1))
+    return any(inseq[pos:pos + len(subseq)] == subseq for pos in xrange(0, len(inseq) - len(subseq) + 1))
 
 def find_all_common_subseq(s1, s2, threshold=3):
 
@@ -28,8 +28,8 @@ def find_all_common_subseq(s1, s2, threshold=3):
     def is_inner_seq(i, j):
         return any(k < i < j <= l or k <= i < j < l for k, l in all_of)
 
-    for i in range(0, len(s1)):
-        for j in range(i + threshold, len(s1) + 1):
+    for i in xrange(0, len(s1)):
+        for j in xrange(i + threshold, len(s1) + 1):
 
             if _contains(subseq=s1[i:j], inseq=s2):
                 all_of.append((i, j))  # add a tuple to work OK when s1, s2 are lists
@@ -56,7 +56,7 @@ def pretty_highlight(instr, all_css, mask_char=None):
     for css_token in all_css:
         
         try:
-            # allow css_token be responsible of it's regex representation 
+            # allow css_token be responsible for it's regex representation 
             match = re.search(css_token.__regex__(), instr)
         except (AttributeError):
             match = re.search(re.escape(css_token.__str__()), instr)
